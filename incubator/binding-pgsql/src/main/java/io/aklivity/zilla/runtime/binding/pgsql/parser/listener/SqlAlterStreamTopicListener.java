@@ -27,15 +27,16 @@ import io.aklivity.zilla.runtime.binding.pgsql.parser.model.Operation;
 
 public class SqlAlterStreamTopicListener extends PostgreSqlParserBaseListener
 {
+    private final List<AlterExpression> alterExpressions;
     private final TokenStream tokens;
 
     private String schema;
     private String name;
-    private final List<AlterExpression> alterExpressions = new ArrayList<>();
 
     public SqlAlterStreamTopicListener(
         TokenStream tokens)
     {
+        this.alterExpressions = new ArrayList<>();
         this.tokens = tokens;
     }
 

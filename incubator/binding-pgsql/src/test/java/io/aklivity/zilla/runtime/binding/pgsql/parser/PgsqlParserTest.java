@@ -325,6 +325,31 @@ public class PgsqlParserTest
     }
 
     @Test
+    public void shouldParseCreateZfunctionWithTableReturnType()
+    {
+        String sql = """
+            CREATE ZFUNCTION send_payment_handler(type VARCHAR, user_id VARCHAR, random VARCHAR, amount DOUBLE PRECISION, notes VARCHAR)
+              RETURNS TABLE(type VARCHAR, user_id VARCHAR, request_id VARCHAR, amount DOUBLE PRECISION, notes VARCHAR)
+              LANGUAGE SQL AS $$
+                SELECT
+                    CASE
+                        WHEN balance >= amount THEN "PaymentSent"
+                        ELSE "PaymentDeclined"
+                    END AS type,
+                    user_id,
+                    request_id,
+                    amount,
+                    balance,
+                    notes
+                FROM balance as b WHERE b.user_id = user_id;
+                $$
+            """;
+        Function function = parser.parseCreateZfunction(sql);
+
+        assertNotNull(function);
+    }
+
+    @Test
     public void shouldParseCreateTableWithUniqueConstraint()
     {
         String sql = "CREATE ZTABLE test (id INT UNIQUE, name VARCHAR(100));";
