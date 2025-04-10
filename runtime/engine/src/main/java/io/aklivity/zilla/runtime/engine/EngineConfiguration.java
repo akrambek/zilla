@@ -387,7 +387,12 @@ public class EngineConfiguration extends Configuration
         final double percentMemory = ENGINE_MEMORY_PERCENTAGE.get(config);
         final int totalEventsBufferCapacity = ENGINE_EVENTS_BUFFER_CAPACITY.get(config) * numberOfCores;
 
-        long maxAllowedForBuffers = (long) (percentMemory * totalMemorySize) - totalEventsBufferCapacity;
+        long maxAllowedForMemory = (long) (percentMemory * totalMemorySize) - totalEventsBufferCapacity;
+
+        Path directory = Paths.get(ENGINE_DIRECTORY.get(config));
+        long usableDiskSpace = directory.toFile().getUsableSpace();
+
+        long maxAllowedForBuffers = Math.min(maxAllowedForMemory, usableDiskSpace);
 
         // Streams + Pool
         long bufferCapacity = slotCapacity + slotCapacity;
@@ -395,7 +400,17 @@ public class EngineConfiguration extends Configuration
         long totalBufferCapacity = numberOfCores * (bufferCapacity + budgetBufferCapacity);
         int newWorkersCapacity = (int) (maxAllowedForBuffers  / totalBufferCapacity);
 
-        newWorkersCapacity = findNextPositivePowerOfTwo(newWorkersCapacity);
+        int roundedUp = findNextPositivePowerOfTwo(newWorkersCapacity);
+        long requiredForRoundedUp = (long) roundedUp * totalBufferCapacity;
+
+        if (requiredForRoundedUp <= maxAllowedForBuffers)
+        {
+            newWorkersCapacity = roundedUp;
+        }
+        else
+        {
+            newWorkersCapacity = Math.max(1, roundedUp >> 1);
+        }
 
         return newWorkersCapacity;
     }
