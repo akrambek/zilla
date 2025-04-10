@@ -371,7 +371,7 @@ public class EngineConfiguration extends Configuration
         Configuration config)
     {
         // more consistent with original defaults
-        return BudgetsLayout.SIZEOF_BUDGET_ENTRY * 512 * ENGINE_WORKER_CAPACITY.getAsInt(config);
+        return BudgetsLayout.SIZEOF_BUDGET_ENTRY * ENGINE_WORKER_CAPACITY.getAsInt(config);
     }
 
     private static int defaultWorkersCapacity(
@@ -385,15 +385,15 @@ public class EngineConfiguration extends Configuration
 
         final int slotCapacity = ENGINE_BUFFER_SLOT_CAPACITY.get(config);
         final double percentMemory = ENGINE_MEMORY_PERCENTAGE.get(config);
+        final int totalEventsBufferCapacity = ENGINE_EVENTS_BUFFER_CAPACITY.get(config) * numberOfCores;
 
-        long maxAllowedForBuffers = (long) (percentMemory * totalMemorySize);
+        long maxAllowedForBuffers = (long) (percentMemory * totalMemorySize) - totalEventsBufferCapacity;
 
         // Streams + Pool
         long bufferCapacity = slotCapacity + slotCapacity;
-        long eventsBufferCapacity = ENGINE_EVENTS_BUFFER_CAPACITY.get(config);
-        long budgetBufferCapacity = BudgetsLayout.SIZEOF_BUDGET_ENTRY * 512L;
-        long totalBufferCapacity = numberOfCores * (bufferCapacity + budgetBufferCapacity + eventsBufferCapacity);
-        int newWorkersCapacity = (int) (maxAllowedForBuffers / totalBufferCapacity);
+        long budgetBufferCapacity = BudgetsLayout.SIZEOF_BUDGET_ENTRY;
+        long totalBufferCapacity = numberOfCores * (bufferCapacity + budgetBufferCapacity);
+        int newWorkersCapacity = (int) (maxAllowedForBuffers  / totalBufferCapacity);
 
         newWorkersCapacity = findNextPositivePowerOfTwo(newWorkersCapacity);
 
