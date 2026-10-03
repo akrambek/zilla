@@ -85,6 +85,7 @@
 - refactor\(engine\): add Flags helper for data frame flags [\#2651](https://github.com/aklivity/zilla/pull/2651) ([jfallows](https://github.com/jfallows))
 - feat\(common-yaml\): configure duplicate-key handling with JsonConfig.KEY\_STRATEGY [\#2653](https://github.com/aklivity/zilla/pull/2653) ([jfallows](https://github.com/jfallows))
 - fix\(binding-mcp-kafka\): use INIT and FIN data flags for fragmented consume result [\#2654](https://github.com/aklivity/zilla/pull/2654) ([jfallows](https://github.com/jfallows))
+- feat\(engine\): test guard injects identity and credentials for unauthorized sessions [\#2656](https://github.com/aklivity/zilla/pull/2656) ([jfallows](https://github.com/jfallows))
 
 ## [2.4.7](https://github.com/aklivity/zilla/tree/2.4.7) (2026-09-30)
 
